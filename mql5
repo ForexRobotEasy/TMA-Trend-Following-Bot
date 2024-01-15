@@ -1,0 +1,82 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                            TMA Trend Following Bot|
+//|                                               forexroboteasy.com |
+//|                                         Developed by Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+// Global variables
+input double LotSize = 0.01; // Lot size
+input int StopLoss = 100; // Stop loss size in points
+input int TakeProfit = 200; // Take profit size in points
+input int TradingWindow = 8; // Trading window in hours
+input int EMAPeriod = 20; // EMA period
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Add initialization logic here
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Add deinitialization logic here
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Add trading logic here
+    double currentEMA = iMA(NULL, 0, EMAPeriod, 0, MODE_EMA, PRICE_CLOSE, 0); // Calculate current EMA value
+    double previousEMA = iMA(NULL, 0, EMAPeriod, 0, MODE_EMA, PRICE_CLOSE, 1); // Calculate previous EMA value
+    double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_ASK); // Get current price
+
+    if (currentEMA > previousEMA && currentPrice > currentEMA)
+    {
+        // Open buy trade
+        double stopLossPrice = currentPrice - StopLoss * _Point;
+        double takeProfitPrice = currentPrice + TakeProfit * _Point;
+        ticket = OrderSend(_Symbol, OP_BUY, LotSize, currentPrice, 0, stopLossPrice, takeProfitPrice, 'TMA Trend Following Bot', 0, 0, CLR_NONE);
+        if (ticket > 0)
+        {
+            // Trade executed successfully
+        }
+        else
+        {
+            // Error in trade execution
+        }
+    }
+    else if (currentEMA < previousEMA && currentPrice < currentEMA)
+    {
+        // Open sell trade
+        double stopLossPrice = currentPrice + StopLoss * _Point;
+        double takeProfitPrice = currentPrice - TakeProfit * _Point;
+        ticket = OrderSend(_Symbol, OP_SELL, LotSize, currentPrice, 0, stopLossPrice, takeProfitPrice, 'TMA Trend Following Bot', 0, 0, CLR_NONE);
+        if (ticket > 0)
+        {
+            // Trade executed successfully
+        }
+        else
+        {
+            // Error in trade execution
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+void OnTimer()
+{
+    // Add code here to repeat the trading logic every TradingWindow hours
+}
+
+//+------------------------------------------------------------------+
